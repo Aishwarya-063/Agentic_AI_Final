@@ -1,0 +1,36 @@
+NestIQ Lite - How It Works
+
+Overview:
+NestIQ Lite is a small full-stack relocation concierge demo with a React/Vite frontend and a FastAPI backend.
+
+Frontend (apps/web):
+- The user interface is written in React and served by Vite on http://localhost:5173.
+- The app starts on an onboarding page that asks a series of questions one at a time.
+- User answers are collected and sent to the backend as a profile payload.
+- After onboarding, the app opens an atlas view that streams agent progress and shows the generated relocation plan.
+- The frontend fetches onboarding question prompts, profile creation, orchestration progress, and chat responses from the backend API.
+- The listing cards show a placeholder image area when no real apartment photo is available.
+
+Backend (apps/api):
+- The backend is built with FastAPI and runs on http://localhost:8001.
+- It exposes endpoints for onboarding questions, profile creation, orchestration, results, and chat.
+- When the profile is submitted, the backend generates a session ID and stores a demo profile, neighborhoods, listings, and checklist in memory.
+- The orchestration endpoint uses Server-Sent Events (SSE) to stream agent status updates to the frontend in real time.
+- The backend also supports a chat endpoint that answers questions based on the generated profile and neighborhoods.
+
+Key flow:
+1. The frontend loads and requests onboarding questions from the backend.
+2. The user answers a sequence of questions in the chat-style onboarding UI.
+3. The frontend sends the completed answers to the backend via POST /api/profile.
+4. The backend stores the session and returns a session ID.
+5. The frontend opens /api/orchestrate/{session_id} as an SSE stream and displays agent progress.
+6. As the backend streams events, the UI updates the agent rail and finally renders the relocation dashboard.
+7. The user can ask follow-up concierge chat questions, which are routed to /api/chat/{session_id}.
+
+Image Fix:
+- The listing cards now display a consistent placeholder image panel when no actual listing photo exists.
+- The placeholder uses a styled icon and "No photo available" label so the layout looks complete and polished.
+
+Notes:
+- The app uses local in-memory session storage, so restarting the backend clears any active sessions.
+- The frontend and backend run in separate processes and communicate over HTTP until the user closes the app.
